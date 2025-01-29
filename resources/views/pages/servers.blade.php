@@ -33,6 +33,7 @@
                                         <th>Reboot</th>
                                         <th>Terminate</th>
                                         <th>VPS Instance</th>
+                                        <th>Manipulate</th>
                                         <th>Detail</th>
                                     </tr>
                                 </thead>
@@ -87,6 +88,55 @@
                             <button type="button" class="au-btn au-btn-icon au-btn--green au-btn--small" id="lunchServer" onclick="LunchServe()">Lunch Server</button>
                         </div>
                     </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="manipulate-server" tabindex="-1" role="dialog" aria-labelledby="mediumModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mediumModalLabel">Manipulate Server</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row ">
+
+                        <input type="hidden" id="server_id" name="server_id" class="form-control" placeholder="Enter Server Name" required>
+
+                        <input type="hidden" id="verifiedSessionId" name="verifiedSessionId" class="form-control" placeholder="Enter Server Name" required>
+
+                        <input type="hidden" id="secret" name="secret" class="form-control" placeholder="Enter Server Name" required>
+                        
+                        <div class="col-sm-6">
+        <label for="action" class="control-label mb-1">Action</label>
+        <select id="action" name="action" class="form-control js-example-basic-single">
+            <option value="">Select Action</option>
+            <option value="STOP">STOP</option>
+            <option value="START">START</option>
+            <option value="POWER_OFF">POWER_OFF</option>
+            <option value="TERMINATE">TERMINATE</option>
+            <option value="ENABLE_CONSOLE_ACCESS">ENABLE_CONSOLE_ACCESS</option>
+            <option value="DISABLE_CONSOLE_ACCESS">DISABLE_CONSOLE_ACCESS</option>
+            <option value="ENABLE_RESCUE_MODE">ENABLE_RESCUE_MODE</option>
+            <option value="DISABLE_RESCUE_MODE">DISABLE_RESCUE_MODE</option>
+        </select>
+    </div>
+
+    <!-- Termination Reason (Hidden by Default) -->
+    <div class="col-sm-6" id="termination_reason_container" style="display: none;">
+        <label for="termination_reason" class="control-label mb-1">Termination Reason</label>
+        <input type="text" id="termination_reason" name="termination_reason" class="form-control" placeholder="Enter Termination Reason">
+    </div>
+</div>
+
+<div class="col-12 text-right mt-3">
+    <button type="button" class="au-btn au-btn-icon au-btn--green au-btn--small" data-dismiss="modal" aria-label="Close" id="ManipulateServe" onclick="ManipulateServe()">Update</button>
+</div>
                     
                 </div>
             </div>
@@ -186,12 +236,57 @@
             showAlert("Launch error:" + error , 'error');
         }
     }
+    
+    async function ManipulateServe() {
+  
+        const server_id = document.getElementById("server_id").value;
+        const action = document.getElementById("action").value;
+
+        if (!server_id || !action) {
+            showAlert("Please fill in all the fields." , 'error');
+            return;
+        }
+
+        const myHeadersPost = new Headers();
+        myHeadersPost.append("Content-Type", "application/json");
+        myHeadersPost.append("Authorization", `Bearer ${token}`);
+
+        const raw = JSON.stringify({
+            server_id,
+            action,
+        });
+                
+        const requestOptionsPost = {
+            method: "POST",
+            headers: myHeadersPost,
+            body: raw,
+            redirect: "follow"
+        };
+        // console.log(action, server_id)
+        // return;
+
+        try {
+            const apiUrl = `${BASE_URL}/servers/${server_id}/manipulate`;
+
+            const response = await fetch(apiUrl, requestOptionsPost);
+
+            if (!response.ok) {
+                throw new Error(`Server error occurred while Manipulating: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            showAlert("Server Manipulated successfully!" , 'success');
+            fetchServersAndPopulateTable();
+        } catch (error) {
+            showAlert("Manipulate error:" + error , 'error');
+        }
+    }
 
     // Fetch Servers List API Call
 
     async function fetchServersAndPopulateTable() {
         try {
-            const response = await fetch(`${BASE_URL}/servers?page=1&pageSize=10`, requestOptions);
+            const response = await fetch(`${BASE_URL}/servers?page=1&pageSize=100`, requestOptions);
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch server data: ${response.statusText}`);
@@ -218,11 +313,12 @@
                 <td>${server.name}</td>
                 <td class="text-uppercase">${server.status}</td>
                 <td class="text-uppercase">${server.ableToStop}</td>
-                <td class="text-uppercaseer">${server.ableToPowerOff}</td>
+                <td class="text-uppercase">${server.ableToPowerOff}</td>
                 <td class="text-uppercase">${server.ableToStart}</td>
                 <td class="text-uppercase">${server.ableToReboot}</td>
                 <td class="text-uppercase">${server.ableToTerminate}</td>
                 <td class="text-uppercase">${server.vpsInstance || '-'}</td>
+                <td><button class="manipulate-btn text-capitalize au-btn au-btn-icon au-btn--cornflowerblue au-btn--small" data-toggle="modal" data-target="#manipulate-server" data-id="${server.id}">Manipulate</button></td>
                 <td><a href="${path}/server/detail/${server.id}" class="btn btn-info btn-sm">Detail</a></td>
             `;
 
@@ -230,6 +326,29 @@
         });
     }
     fetchServersAndPopulateTable();
+
+    // $(document).on("click", ".manipulate-btn", function () {
+    //     console.log($(this).data('id'));
+    // });
+
+    document.addEventListener("click", function (event) {
+        if (event.target.classList.contains("manipulate-btn")) {
+            const serverId = event.target.dataset.id;
+            console.log(serverId)
+
+            document.getElementById("server_id").value = serverId;
+            // window.location.href = `${path}/server/manipulate/${serverId}`;
+        }
+    });
+    document.getElementById("action").addEventListener("change", function () {
+    const terminationReasonContainer = document.getElementById("termination_reason_container");
+
+    if (this.value === "TERMINATE") {
+        terminationReasonContainer.style.display = "block"; // Show the field
+    } else {
+        terminationReasonContainer.style.display = "none"; // Hide the field
+    }
+});
 </script>
 
 @endsection

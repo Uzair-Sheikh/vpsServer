@@ -36,4 +36,8 @@
         border-radius: 5px; 
         border: 1px solid #ddd;
     }
+
+    #Profile .title{
+        font-weight: 500;
+    }
 </style>
