@@ -119,6 +119,7 @@
             <option value="STOP">STOP</option>
             <option value="START">START</option>
             <option value="POWER_OFF">POWER_OFF</option>
+            <option value="REBOOT">REBOOT</option>
             <option value="TERMINATE">TERMINATE</option>
             <option value="ENABLE_CONSOLE_ACCESS">ENABLE_CONSOLE_ACCESS</option>
             <option value="DISABLE_CONSOLE_ACCESS">DISABLE_CONSOLE_ACCESS</option>

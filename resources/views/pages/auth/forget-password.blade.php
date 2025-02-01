@@ -12,20 +12,17 @@
         <div class="page-content--bge5">
             <div class="container">
                 <div class="login-wrap">
+                
                     <div class="login-content">
-                        <div class="login-logo">
-                            <a href="#">
-                                <img src="{{asset('asset/images/icon/logo.png')}}" alt="CoolAdmin">
-                            </a>
-                        </div>
 
                         <!-- Start Password Reset Form -->
                         <form id="start-form">
-                            <div class="mb-3">
+                        <h2 class="mb-3 text-center">Forget Password</h2>
+                            <div class="mb-3 ">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="au-input au-input--full" id="email" name="email" placeholder="Enter your email" required>
+                                <input type="email" class="au-input au-input--full"style="border-radius:20px" id="email" name="email" placeholder="Enter your email" required>
                             </div>
-                            <button type="button" class="au-btn au-btn--block au-btn--green m-b-20" id="start-button">Start Password Reset</button>
+                            <button type="button" class="au-btn au-btn--block au-btn--blue2--block m-b-18 h-6" id="start-button"style="color:white;border-radius:20px; height:46px; background:rgb(31, 101, 252)">Start Password Reset</button>
                             <div class="register-link">
                                 <p>
                                     Have an account?
@@ -38,9 +35,9 @@
                         <form id="otp-form" class="mt-4 d-none">
                             <div class="mb-3">
                                 <label for="otp" class="form-label">OTP</label>
-                                <input type="text" class="au-input au-input--full" id="otp" name="otp" placeholder="Enter OTP" required>
+                                <input type="text" class="au-input au-input--full" id="otp" name="otp" placeholder="Enter OTP" required style="border-radius: 20px;">
                             </div>
-                            <button type="button" class="au-btn au-btn--block au-btn--green m-b-20" id="verify-button">Verify OTP</button>
+                            <button type="button" class="btn btn-primary w-100 mb-3" id="verify-button" style="height: 50px; border-radius: 20px;">Verify OTP</button>
                         </form>
 
                         <!-- Reset Password Form -->
